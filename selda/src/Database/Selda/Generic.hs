@@ -12,7 +12,8 @@ module Database.Selda.Generic
   , mkColName
   ) where
 import Control.Monad.State
-    ( liftM2, MonadState(put, get), evalState, State )
+    ( MonadState(put, get), evalState, State )
+import Control.Monad (liftM2)
 import Data.Dynamic ( Typeable )
 import Data.Text as Text (Text, pack)
 
