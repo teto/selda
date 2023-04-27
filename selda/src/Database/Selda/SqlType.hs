@@ -27,7 +27,8 @@ import Data.Time
       ParseTime,
       TimeOfDay(TimeOfDay) )
 import Data.Typeable ( Typeable )
-import Data.UUID.Types (UUID, toString, fromByteString, nil)
+import qualified Data.UUID.Types as UUID
+import Data.UUID.Types (UUID, toString, nil)
 import GHC.Generics (Generic)
 
 -- | Format string used to represent date and time when
@@ -430,8 +431,8 @@ instance SqlType BSL.ByteString where
 instance SqlType UUID where
   mkLit = LUUID
   sqlType _ = TUUID
-  fromSql (SqlBlob x) = fromJust . fromByteString $ BSL.fromStrict x
-  fromSql v           = fromSqlError $ "UUID column with non-blob value: " ++ show v
+  fromSql (SqlString x) = fromJust . UUID.fromText $ x
+  fromSql v           = fromSqlError $ "UUID column with non-string value: " ++ show v
   defaultValue = LUUID nil
 
 -- | @defaultValue@ for UUIDs is the all-zero RFC4122 nil UUID.

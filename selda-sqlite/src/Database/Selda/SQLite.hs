@@ -6,8 +6,8 @@ module Database.Selda.SQLite
   , sqliteOpen, seldaClose
   , sqliteBackend
   ) where
-import Database.Selda
-import Database.Selda.Backend
+import Database.Selda hiding (toText, fromText)
+import Database.Selda.Backend hiding (toText, fromText)
 import Database.Selda.SQLite.Parser
 import Data.Maybe (fromJust)
 #ifndef __HASTE__
@@ -18,7 +18,7 @@ import Data.Dynamic
 import Data.Int (Int64)
 import Data.Text as Text (pack, toLower, take, intercalate)
 import Data.Time (FormatTime, formatTime, defaultTimeLocale)
-import Data.UUID.Types (toByteString)
+import Data.UUID.Types (fromText, toText, toByteString)
 import Database.SQLite3
 import System.Directory (makeAbsolute)
 #endif
@@ -221,13 +221,15 @@ toSqlData (LBlob b)     = SQLBlob b
 toSqlData (LNull)       = SQLNull
 toSqlData (LJust x)     = toSqlData x
 toSqlData (LCustom _ l) = toSqlData l
-toSqlData (LUUID x)     = SQLBlob (toStrict $ toByteString x)
+toSqlData (LUUID x)     = SQLText (toText x)
 toSqlData (LTextArray s) = SQLText (intercalate "," s)
 
 fromSqlData :: SQLData -> SqlValue
 fromSqlData (SQLInteger i) = SqlInt64 $ fromIntegral i
 fromSqlData (SQLFloat f)   = SqlFloat f
-fromSqlData (SQLText s)    = SqlString s
+fromSqlData (SQLText s)    = case fromText s of
+      Just uuid -> SQLBlob (toStrict $ toByteString x)
+      Nothing -> SqlString s
 fromSqlData (SQLBlob b)    = SqlBlob b
 fromSqlData SQLNull        = SqlNull
 
