@@ -5,6 +5,7 @@ module Database.Selda.PostgreSQL
   , withPostgreSQL, on, auth
   , pgOpen, pgOpen', seldaClose
   , pgConnString, pgPPConfig
+  , pgBackend
   ) where
 #if !MIN_VERSION_base(4, 11, 0)
 import Data.Monoid
