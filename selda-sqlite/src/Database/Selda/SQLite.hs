@@ -3,8 +3,11 @@
 module Database.Selda.SQLite
   ( SQLite
   , withSQLite
-  , sqliteOpen, seldaClose
+  , sqliteOpen, sqliteOpen2
+  , seldaClose
   , sqliteBackend
+  , SQLVFS
+  , SQLOpenFlag
   ) where
 import Database.Selda
 import Database.Selda.Backend
@@ -35,6 +38,26 @@ sqliteOpen _ = error "sqliteOpen called in JS context"
 sqliteOpen file = do
   mask $ \restore -> do
     edb <- try $ liftIO $ open (pack file)
+    case edb of
+      Left e@(SQLError{}) -> do
+        throwM (DbError (show e))
+      Right db -> flip onException (liftIO (close db)) . restore $ do
+        absFile <- liftIO $ pack <$> makeAbsolute file
+        let backend = sqliteBackend db
+        void . liftIO $ runStmt backend "PRAGMA foreign_keys = ON;" []
+        newConnection backend absFile
+#endif
+
+-- | Open a new connection to an SQLite database.
+--   The connection is reusable across calls to `runSeldaT`, and must be
+--   explicitly closed using 'seldaClose' when no longer needed.
+sqliteOpen2 :: (MonadIO m, MonadMask m) => FilePath -> [SQLOpenFlag] -> SQLVFS -> m (SeldaConnection SQLite)
+#ifdef __HASTE__
+sqliteOpen2 _ _ _ = error "sqliteOpen called in JS context"
+#else
+sqliteOpen2 file flags zvfs = do
+  mask $ \restore -> do
+    edb <- try $ liftIO $ open2 (pack file) flags zvfs
     case edb of
       Left e@(SQLError{}) -> do
         throwM (DbError (show e))
