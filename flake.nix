@@ -13,14 +13,13 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    hls.url = "github:haskell/haskell-language-server";
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, hls, ... }:
+  outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
 
@@ -39,8 +38,8 @@
         myModifier = drv:
           pkgs.haskell.lib.addBuildTools drv (with hsPkgs; [
             cabal-install
+            haskell-language-server
             # TODO use the one from nixpkgs instead
-            # hls.packages.${system}."haskell-language-server-${compilerVersion}"
           ]);
 
         # mkDevShell
