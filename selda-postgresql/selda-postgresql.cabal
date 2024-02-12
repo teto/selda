@@ -27,18 +27,18 @@ library
     OverloadedStrings
     CPP
   build-depends:
-      base       >=4.9 && <5
-    , bytestring >=0.9 && <0.12
-    , exceptions >=0.8 && <0.11
-    , selda      >=0.5 && <0.6
-    , selda-json >=0.1 && <0.2
-    , text       >=1.0 && <2.1
+      base
+    , bytestring
+    , exceptions
+    , selda
+    , selda-json
+    , text
   if !flag(haste)
     build-depends:
-        postgresql-binary >=0.12 && <0.13
-      , postgresql-libpq  >=0.9  && <0.10
-      , time              >=1.5  && <1.13
-      , uuid-types        >=1.0  && <1.1
+        postgresql-binary
+      , postgresql-libpq
+      , time
+      , uuid-types
   hs-source-dirs:
     src
   default-language:
