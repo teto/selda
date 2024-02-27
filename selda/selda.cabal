@@ -90,3 +90,4 @@ library
     Haskell2010
   ghc-options:
     -Wall
+    -Werror

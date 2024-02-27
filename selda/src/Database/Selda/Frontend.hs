@@ -119,6 +119,16 @@ tryInsert tbl row = do
     Left (SqlError _) -> return False
     Left e            -> throwM e
 
+ 
+-- eitherInsert :: (MonadSelda m, MonadCatch m, Relational a) => Table a -> [a] -> m Bool
+-- eitherInsert tbl row = do
+--   mres <- try $ insert tbl row
+--   pure mres
+  -- case mres of
+  --   Right _           -> return True
+  --   Left (SqlError _) -> return False
+  --   Left e            -> throwM e
+
 -- | Attempt to perform the given update. If no rows were updated, insert the
 --   given row.
 --   Returns the primary key of the inserted row, if the insert was performed.

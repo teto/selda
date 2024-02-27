@@ -82,6 +82,7 @@ defType TBlob     = "BLOB"
 defType TUUID     = "BLOB"
 defType TJSON     = "BLOB"
 defType TTextArray = "TEXT[]"
+defType TFloatArray = "FLOAT[]"
 
 -- | Default compilation for a column attribute.
 defColAttr :: ColAttr -> Text

@@ -55,6 +55,7 @@ data SqlTypeRep
   | TInt64
   | TInt32
   | TFloat
+  | TFloatArray
   | TBool
   | TDateTime
   | TDate
@@ -119,6 +120,7 @@ data Lit a where
   LCustom   :: SqlTypeRep  -> Lit a -> Lit b
   LUUID     :: !UUID       -> Lit UUID
   LTextArray :: ![Text]     -> Lit [Text]
+  LDoubleArray :: ![Double]     -> Lit [Double]
 
 -- | The SQL type representation for the given literal.
 litType :: Lit a -> SqlTypeRep
@@ -139,6 +141,7 @@ litType (x@LNull)     = sqlType (proxyFor x)
 litType (LCustom t _) = t
 litType (LUUID{})     = TUUID
 litType (LTextArray{}) = TTextArray
+litType (LDoubleArray{}) = TFloatArray
 
 instance Eq (Lit a) where
   a == b = compLit a b == EQ
@@ -162,6 +165,7 @@ litConTag (LNull)       = 11
 litConTag (LCustom{})   = 12
 litConTag (LUUID{})     = 13
 litConTag (LTextArray{}) = 14
+litConTag (LDoubleArray{}) = 15
 
 -- | Compare two literals of different type for equality.
 compLit :: Lit a -> Lit b -> Ordering
@@ -178,6 +182,7 @@ compLit (LJust x)     (LJust x')     = x `compLit` x'
 compLit (LCustom _ x) (LCustom _ x') = x `compLit` x'
 compLit (LUUID x)     (LUUID x')     = x `compare` x'
 compLit (LTextArray x) (LTextArray x') = x `compare` x'
+compLit (LDoubleArray x) (LDoubleArray x') = x `compare` x'
 compLit a             b              = litConTag a `compare` litConTag b
 
 -- | Some value that is representable in SQL.
@@ -193,6 +198,7 @@ data SqlValue where
   SqlDate    :: !Day        -> SqlValue
   SqlNull    :: SqlValue
   SqlStringA :: ![Text]     -> SqlValue
+  SqlFloatA  :: ![Double]   -> SqlValue
 
 instance Show SqlValue where
   show (SqlInt32 n)   = "SqlInt32 " ++ show n
@@ -205,6 +211,7 @@ instance Show SqlValue where
   show (SqlTime t)    = "SqlTime " ++ show t
   show (SqlDate d)    = "SqlDate " ++ show d
   show (SqlStringA s) = "SqlStringA " ++ show s
+  show (SqlFloatA s)  = "SqlFloatA " ++ show s
   show (SqlNull)      = "SqlNull"
 
 instance Show (Lit a) where
@@ -222,6 +229,7 @@ instance Show (Lit a) where
   show (LCustom _ l) = show l
   show (LUUID u)     = toString u
   show (LTextArray s) = show s
+  show (LDoubleArray s) = show s
 
 -- | A row identifier for some table.
 --   This is the type of auto-incrementing primary keys.

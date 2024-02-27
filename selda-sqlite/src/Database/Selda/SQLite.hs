@@ -223,6 +223,7 @@ toSqlData (LJust x)     = toSqlData x
 toSqlData (LCustom _ l) = toSqlData l
 toSqlData (LUUID x)     = SQLBlob (toStrict $ toByteString x)
 toSqlData (LTextArray s) = SQLText (intercalate "," s)
+toSqlData (LDoubleArray s) = SQLText (pack $ show s)
 
 fromSqlData :: SQLData -> SqlValue
 fromSqlData (SQLInteger i) = SqlInt64 $ fromIntegral i
