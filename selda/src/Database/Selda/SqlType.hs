@@ -120,7 +120,7 @@ data Lit a where
   LCustom   :: SqlTypeRep  -> Lit a -> Lit b
   LUUID     :: !UUID       -> Lit UUID
   LTextArray :: ![Text]     -> Lit [Text]
-  LDoubleArray :: ![Double]     -> Lit [Double]
+  LDoubleArray :: ![Double] -> Lit [Double]
 
 -- | The SQL type representation for the given literal.
 litType :: Lit a -> SqlTypeRep
@@ -357,8 +357,15 @@ instance SqlType [Text] where
   mkLit = LTextArray
   sqlType _ = TTextArray
   fromSql (SqlStringA x) = x
-  fromSql v              = fromSqlError $ "text column with non-text-array value: " ++ show v
+  fromSql v              = fromSqlError $ "text array column with non-text-array value: " ++ show v
   defaultValue = LTextArray []
+
+instance SqlType [Double] where
+  mkLit = LDoubleArray
+  sqlType _ = TFloatArray
+  fromSql (SqlFloatA x) = x
+  fromSql v              = fromSqlError $ "double array column with non-double-array value: " ++ show v
+  defaultValue = LDoubleArray []
 
 instance SqlType LazyText.Text where
   mkLit = LCustom TText . LText . mconcat . LazyText.toChunks
