@@ -11,10 +11,17 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/haskell-updates";
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
       url = "github:edolstra/flake-compat";
+      flake = false;
+    };
+
+    # cabal hashes contains all the version for different haskell packages, to update:
+    # nix flake lock --update-input all-cabal-hashes-unpacked
+    all-cabal-hashes-unpacked = {
+      url = "github:commercialhaskell/all-cabal-hashes/current-hackage";
       flake = false;
     };
   };
@@ -23,13 +30,16 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
 
-        compilerVersion = "96";
+        compilerVersion = "98";
 
         haskellOverlay = hnew: hold: with pkgs.haskell.lib; { };
 
         pkgs = import nixpkgs {
           inherit system;
           config = { allowUnfree = false; allowBroken = true; };
+          overlays = [
+            # final: prev: =
+          ];
         };
 
         hsPkgs = pkgs.haskell.packages."ghc${compilerVersion}";
